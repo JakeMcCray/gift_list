@@ -8,10 +8,8 @@ edition = "2021"
 [dependencies]
 argon2 = "0.5.3"
 rocket = "0.5.0"
+rustls = "0.22.2"
 
 [dependencies.rocket_db_pools]
 version = "0.1.0"
 features = ["sqlx_sqlite"]
-
-[default.databases.sqlite_logs]
-url = "../gift_list.db"
