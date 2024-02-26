@@ -1,0 +1,2 @@
+[default.databases.gift_list]
+url = "../gift_list.db"

@@ -1,34 +1,35 @@
 /*****************************************************
  *  Status:
  *
- * Was able to set up the database. Now I need code to
- * create accounts (don't forget the index function
- * contains mainly test code that should be deleted)
+ *  Succefully sorted out the database and create user
+ *  function. Next step is to work on mounting a login
+ *  handeler that works with a form. I also need to
+ *  implement the user::exists function.
+ *
+ *
+ *  Other:
+ *  -remember to change the lsp settings to map
+ *      :LspDocumentDiagnostics to somtihng and
+ *      to get rid of the default diagnostics
  * **************************************************/
 
-mod user;
-
-use rocket_db_pools::sqlx::{self, Row};
-use rocket_db_pools::{Connection, Database};
+pub mod user;
 
 #[macro_use]
 extern crate rocket;
 
+use rocket_db_pools::sqlx::{self, Row};
+use rocket_db_pools::{Connection, Database};
+
 #[derive(Database)]
 #[database("gift_list")]
-struct Db(sqlx::SqlitePool);
+pub struct Db(sqlx::SqlitePool);
 
 #[get("/")]
 async fn index(mut db: Connection<Db>) -> &'static str {
-    match {
-        sqlx::query("SELECT name FROM users")
-            .fetch_one(&mut **db)
-            .await
-            .unwrap()
-            .is_empty()
-    } {
-        true => "Hello World",
-        false => "cannot find anything in db",
+    match user::User::new(db, "John Doe", &None, "Password123").await {
+        Ok(_) => "User Succefully created",
+        Err(_) => "An error occured",
     }
 }
 
