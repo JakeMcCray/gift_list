@@ -1,10 +1,10 @@
 /*****************************************************
  *  Status:
+ *      No bugs i am aware of, login function left unfinished
  *
- *  Succefully sorted out the database and create user
- *  function. Next step is to work on mounting a login
- *  handeler that works with a form. I also need to
- *  implement the user::exists function.
+ *  Todo:
+ *      -Finish login funtion
+ *      -Create Mutex lock for log
  *
  *
  *  Other:
@@ -14,6 +14,8 @@
  * **************************************************/
 
 pub mod user;
+
+use user::UserError;
 
 #[macro_use]
 extern crate rocket;
@@ -27,8 +29,18 @@ pub struct Db(sqlx::SqlitePool);
 
 #[get("/")]
 async fn index(mut db: Connection<Db>) -> &'static str {
-    match user::User::new(db, "John Doe", &None, "Password123").await {
+    match user::User::new(
+        db,
+        "John Doe",
+        &Some("email@gmail.com".to_string()),
+        "Password123",
+    )
+    .await
+    {
         Ok(_) => "User Succefully created",
+        Err(UserError::UsernameExists) => "user with that username already exists",
+        Err(UserError::EmailExists) => "user with that email already exists",
+        Err(UserError::DatabaseError) => "There was a problem accesing the database",
         Err(_) => "An error occured",
     }
 }
