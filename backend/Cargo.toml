@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 argon2 = "0.5.3"
-rocket = "0.5.0"
+rocket = { version = "0.5.0", features = ["json"] }
 rustls = "0.22.2"
 
 [dependencies.rocket_db_pools]

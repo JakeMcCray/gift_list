@@ -2,10 +2,13 @@ use argon2::{
     password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
     Argon2,
 };
+
 use rocket_db_pools::sqlx::{self, Row};
-use rocket_db_pools::{Connection, Database};
+use rocket_db_pools::Connection;
 
 use crate::Db;
+
+use rocket::serde::Deserialize;
 
 pub enum UserError {
     UsernameExists,
@@ -13,82 +16,142 @@ pub enum UserError {
     DatabaseError,
     EmailExists,
     PasswordFailed,
+    UserDontExist,
 }
 
+#[derive(Deserialize)]
+#[serde(crate = "rocket::serde")]
+enum PHash {
+    Password(String),
+    Hash(String),
+}
+
+/***********************************
+ *  Note:
+ *
+ *  This this struct represents a
+ *  hypothetical user, it is not
+ *  known if the user actually exists
+ *  in the database if there is a
+ *  user object
+ * ********************************/
+#[derive(Deserialize)]
+#[serde(crate = "rocket::serde")]
 pub struct User {
-    //id: u64,
     username: String,
     email: Option<String>,
-    p_hash: String,
+    password: PHash,
 }
 
 impl User {
     /******************************************
-     *  Function: new
+     *  Function: register_user
      *
-     *  Desc: creates a new user and inserts
-     *  them into the database
+     *  Desc: insert user into database if
+     *  no other user exists
      *
-     *  Error: returns an error if it is unable
-     *  to create a user
+     *  Errors:
+     *      -DatabaseError
+     *      -UsernameExists
+     *      -EmailExists
      * ***************************************/
-    pub async fn new(
-        mut db: Connection<Db>,
-        username: &str,
-        email: &Option<String>,
-        password: &str,
-    ) -> Result<User, UserError> {
-        //gives error if there is a conficting user
-        User::name_is_free(&mut **db, username).await?;
-        if let Some(email) = email {
+    pub async fn register_user(&mut self, mut db: Connection<Db>) -> Result<(), UserError> {
+        //check to see if the user exists
+        //Mutex here
+        User::name_is_free(&mut **db, &self.username).await?;
+        if let Some(email) = &self.email {
             User::email_is_free(&mut **db, email).await?;
         }
-        //hash password
-        let salt = SaltString::generate(&mut OsRng);
 
-        let argon2 = Argon2::default();
-        let password_hash = argon2.hash_password(password.as_bytes(), &salt);
+        self.try_hash_password();
 
-        if let Ok(p_hash) = password_hash {
-            //add user details to database
-            if let Err(_) = match email {
-                Some(email) => {
-                    sqlx::query("INSERT INTO users (name, email, pHash) VALUES (?, ?, ?)")
-                        .bind(username)
-                        .bind(email)
-                        .bind(p_hash.to_string())
-                        .execute(&mut **db)
-                        .await
+        match &self.password {
+            PHash::Hash(hash) => User::enter_user(&self.username, &self.email, hash, db).await,
+            PHash::Password(_) => Err(UserError::HashError),
+        }
+        //drop Mutex here
+    }
+
+    /******************************************
+     *  Function: enter_user
+     *
+     *  Desc: puts user info into the database
+     *  this function assumes that the password
+     *  has already been hashed and no duplicate
+     *  user exists
+     * ***************************************/
+    async fn enter_user(
+        username: &str,
+        email: &Option<String>,
+        hash: &str,
+        mut db: Connection<Db>,
+    ) -> Result<(), UserError> {
+        //I am left with a choice
+        //On one hand I can have nested match statments, and leave the code somewhat confusing to
+        //read
+        //...
+        //On the other hand I can put the inner match statments into two functions, and create
+        //confusing names for the functions
+        match email {
+            Some(email) => {
+                match sqlx::query("INSERT INTO users (name,email,p_hash) VALUES (?, ?, ?)")
+                    .bind(username)
+                    .bind(email)
+                    .bind(hash)
+                    .execute(&mut **db)
+                    .await
+                {
+                    Ok(_) => Ok(()),
+                    Err(_) => Err(UserError::DatabaseError),
                 }
-                None => {
-                    sqlx::query("INSERT INTO users (name, pHash) VALUES (?, ?)")
-                        .bind(username)
-                        .bind(p_hash.to_string())
-                        .execute(&mut **db)
-                        .await
-                }
-            } {
-                Err(UserError::DatabaseError)?;
             }
-            //create user to return
-            Ok(User {
-                username: String::from(username),
-                email: email.clone(),
-                p_hash: p_hash.to_string(),
-            })
-        } else {
-            Err(UserError::HashError)
+            None => {
+                match sqlx::query("INSERT INTO users (name,p_hash) VALUES (?, ?)")
+                    .bind(username)
+                    .bind(hash)
+                    .execute(&mut **db)
+                    .await
+                {
+                    Ok(_) => Ok(()),
+                    Err(_) => Err(UserError::DatabaseError),
+                }
+            }
         }
     }
 
+    /******************************************
+     *  Function: hash_password
+     *
+     *  Desc: tries to hash the password of a user
+     * ***************************************/
+
+    fn try_hash_password(&mut self) {
+        match &self.password {
+            PHash::Password(pass) => {
+                let salt = SaltString::generate(&mut OsRng);
+
+                let argon2 = Argon2::default();
+
+                match argon2.hash_password(String::from(pass).as_bytes(), &salt) {
+                    Ok(hash) => self.password = PHash::Hash(hash.to_string()),
+
+                    Err(_) => (), //¯\_(ツ)_/¯ error handeling is for chumps
+                                  //note: this means that i will need to error handle whenever i
+                                  //want a hash from the user
+                }
+            }
+            PHash::Hash(_) => (),
+        }
+    }
     /******************************************
      *  Function: name_is_free
      *
      *  Desc: returns Ok(()) if a user does not
      *  exist with the username
      *
-     *  Error: returns an error if there user
-     *  exists or if cannot connect to database
+     *  Error:
+     *      -UsernameExists
+     *      -DatabaseError
      * ***************************************/
     async fn name_is_free(
         db: &mut sqlx::SqliteConnection,
@@ -116,8 +179,9 @@ impl User {
      *  Desc: returns Ok(()) if a user does not
      *  exist with the username
      *
-     *  Error: returns an error if there user
-     *  exists or if cannot connect to database
+     *  Error:
+     *      -EmailExists
+     *      -DatabaseError
      * ***************************************/
     async fn email_is_free(db: &mut sqlx::SqliteConnection, email: &str) -> Result<(), UserError> {
         match sqlx::query("SELECT email FROM users WHERE email = ?")
@@ -140,12 +204,46 @@ impl User {
      *  Function: verify_login
      *
      *  Desc: Returns User if user can login
+     *  also returns false if any error occurs
      *
-     *  Error: Returns error if cannot find
-     *  user or if password does not match
      * ***************************************/
-    pub fn verify_login(user: User, password: &str) -> Result<User, UserError> {
-        //brain no thinky, come back and do later
-        todo!()
+    pub async fn verify_login(mut db: Connection<Db>, user: &User) -> Result<(), UserError> {
+        match sqlx::query("SELECT p_hash FROM users WHERE name = ?")
+            .bind(&user.username)
+            .fetch_one(&mut **db)
+            .await
+        {
+            Ok(hash) => {
+                let hash: &str = hash.get("p_hash");
+                User::check_password(hash, &user.password)
+            }
+            Err(_) => Err(UserError::DatabaseError),
+        }
+    }
+
+    /******************************************
+     *  Function: verify_login
+     *
+     *  Desc: Returns User if user can login
+     *  also returns false if any error occurs
+     *
+     *  this description is wrong, too lazy to
+     *  fix
+     *
+     * ***************************************/
+    fn check_password(hash: &str, password: &PHash) -> Result<(), UserError> {
+        match password {
+            PHash::Password(password) => {
+                if let Ok(parsed_hash) = PasswordHash::new(&hash) {
+                    Argon2::default()
+                        .verify_password(password.as_bytes(), &parsed_hash)
+                        .map_err(|_| UserError::PasswordFailed)
+                } else {
+                    Err(UserError::PasswordFailed)
+                }
+            }
+            //idk if this is what i want to do, maybe come back later and fix
+            PHash::Hash(_) => Err(UserError::HashError),
+        }
     }
 }
