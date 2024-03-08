@@ -46,15 +46,22 @@ async fn register(db: Connection<Db>, user: Json<user::User>) -> Option<NamedFil
     }
 }
 
+#[get("/<file>")]
+async fn file(file: &str) -> Option<NamedFile> {
+    NamedFile::open(format!("../frontend/dist/{}", file))
+        .await
+        .ok()
+}
+
 #[get("/")]
 async fn index() -> Option<NamedFile> {
-    NamedFile::open("homepage.html").await.ok()
+    NamedFile::open("../frontend/dist/index.html").await.ok()
 }
 
 #[launch]
 fn rocket() -> _ {
     rocket::build()
         .attach(Db::init())
-        .mount("/", routes![index, login])
+        .mount("/", routes![index, login, file])
         .mount("/login", routes![register])
 }

@@ -1,0 +1,13 @@
+/home/jake/projects/gift_list/frontend/target/debug/deps/libsycamore-b11eed449c11b38f.rmeta: /home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/lib.rs /home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/builder.rs /home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/easing.rs /home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/flow.rs /home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/motion.rs /home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/utils.rs /home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/web/mod.rs /home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/web/html.rs /home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/web/portal.rs
+
+/home/jake/projects/gift_list/frontend/target/debug/deps/sycamore-b11eed449c11b38f.d: /home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/lib.rs /home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/builder.rs /home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/easing.rs /home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/flow.rs /home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/motion.rs /home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/utils.rs /home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/web/mod.rs /home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/web/html.rs /home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/web/portal.rs
+
+/home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/lib.rs:
+/home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/builder.rs:
+/home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/easing.rs:
+/home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/flow.rs:
+/home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/motion.rs:
+/home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/utils.rs:
+/home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/web/mod.rs:
+/home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/web/html.rs:
+/home/jake/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sycamore-0.8.2/src/web/portal.rs:

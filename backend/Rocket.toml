@@ -1,2 +1,5 @@
 [default.databases.gift_list]
 url = "../gift_list.db"
+
+[debug]
+address = "192.168.1.97"

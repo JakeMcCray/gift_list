@@ -1,0 +1,69 @@
+body{
+  background: #6E9075;
+}
+.LoginBox {
+  font-size: 26px;
+  background: #78C091;
+  width: 400px;
+  height: 400px;
+  margin: auto;
+  box-shadow: 3px 3px 20px;
+  text-align: center;
+  font-size: 16px;
+  border-radius: 8px;
+  padding-top: 50px;
+  margin-top: 10%;
+}
+
+.RegisterBox {
+  font-size: 26px;
+  background: #78C091;
+  width: 400px;
+  height: 500px;
+  margin: auto;
+  box-shadow: 3px 3px 20px;
+  text-align: center;
+  font-size: 16px;
+  border-radius: 8px;
+  padding-top: 50px;
+  margin-top: 10%;
+}
+
+.TextBox {
+  background: #81F0E5;
+  margin-top: 50px;
+  margin-bottom: 30px;
+  height: 36px;
+  width: 300px;
+  border-width: 0px;
+  border-radius: 5px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.Sidebar{
+  background: #563635;
+  position: fixed;
+  height: 100%;
+  top: 0;
+  left: 0;
+  width: 120px
+}
+
+button{
+  height: 50%;
+  width: 110px;
+  margin-left: 10px;
+  background: #5B6057;
+  border-color: #563635;
+  border-right: 0px;
+}
+
+.ButtonDown{
+  height: 50%;
+  width: 110px;
+  margin-left: 10px;
+  background: #6E9075;
+  border-color: #563635;
+  border-right: 0px;
+}
