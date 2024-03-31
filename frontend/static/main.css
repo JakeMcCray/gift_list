@@ -1,15 +1,15 @@
 body{
-  background: #6E9075;
+  color: #F2F2F2;
+  background: #FF6B6B;
 }
 .LoginBox {
   font-size: 26px;
-  background: #78C091;
+  background: #FFD166;
   width: 400px;
   height: 400px;
   margin: auto;
-  box-shadow: 3px 3px 20px;
+  box-shadow: 3px 3px 20px #6B5B95;
   text-align: center;
-  font-size: 16px;
   border-radius: 8px;
   padding-top: 50px;
   margin-top: 10%;
@@ -17,20 +17,19 @@ body{
 
 .RegisterBox {
   font-size: 26px;
-  background: #78C091;
+  background: #FFD166;
   width: 400px;
   height: 500px;
   margin: auto;
-  box-shadow: 3px 3px 20px;
+  box-shadow: 3px 3px 20px #6B5B95;
   text-align: center;
-  font-size: 16px;
   border-radius: 8px;
   padding-top: 50px;
   margin-top: 10%;
 }
 
 .TextBox {
-  background: #81F0E5;
+  background: #fff;
   margin-top: 50px;
   margin-bottom: 30px;
   height: 36px;
@@ -38,11 +37,11 @@ body{
   border-width: 0px;
   border-radius: 5px;
   font-size: 18px;
-  cursor: pointer;
+  cursor: text;
 }
 
 .Sidebar{
-  background: #563635;
+  background: #6B5B95;
   position: fixed;
   height: 100%;
   top: 0;
@@ -51,11 +50,12 @@ body{
 }
 
 button{
+  color: #F2F2F2;
   height: 50%;
   width: 110px;
   margin-left: 10px;
-  background: #5B6057;
-  border-color: #563635;
+  background: #6B5B95;
+  border-color: #6B5B95;
   border-right: 0px;
 }
 
@@ -63,7 +63,7 @@ button{
   height: 50%;
   width: 110px;
   margin-left: 10px;
-  background: #6E9075;
-  border-color: #563635;
+  background: #FF6B6B;
+  border-color: #6B5B95;
   border-right: 0px;
 }
