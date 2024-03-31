@@ -1,2 +1,4 @@
 gift_list.db
-*/target
+/*/target
+/ui/dist/*
+!/ui/dist/index.html
