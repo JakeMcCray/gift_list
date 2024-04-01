@@ -1,15 +1,14 @@
 use yew::prelude::*;
 
-pub mod login;
-use crate::login::*;
+pub mod components;
 
-pub mod sidebar;
-use crate::sidebar::*;
+use components::organisms::login::*;
+use components::organisms::register::*;
+use components::organisms::sidebar::*;
 
 #[function_component(App)]
 fn app() -> Html {
-    let state = use_state(|| sidebar::ButtonState::Login);
-    akjsfhakjhfkj
+    let state = use_state(|| ButtonState::Login);
     html! {
         <>
             <Sidebar button_state={state.clone()}/>
