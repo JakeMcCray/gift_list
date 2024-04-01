@@ -1,0 +1,11 @@
+#!/bin/bash
+
+pushd ui > /dev/null 2>&1
+echo "Building UI..."
+trunk build > /dev/null 2>&1
+popd > /dev/null 2>&1
+
+pushd server > /dev/null 2>&1
+echo "Running server..."
+cargo run
+popd > /dev/null 2>&1
