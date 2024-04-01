@@ -9,6 +9,7 @@ use crate::sidebar::*;
 #[function_component(App)]
 fn app() -> Html {
     let state = use_state(|| sidebar::ButtonState::Login);
+    akjsfhakjhfkj
     html! {
         <>
             <Sidebar button_state={state.clone()}/>
