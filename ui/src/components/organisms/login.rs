@@ -12,9 +12,3 @@ pub fn LoginBox() -> Html {
         </div>
     }
 }
-
-//WARNING: I don't know how to do enviroment variable so i need to change this whenever my
-//ip/domain changes
-fn login() {
-    todo!();
-}

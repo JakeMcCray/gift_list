@@ -1,5 +1,7 @@
 use yew::prelude::*;
 
+use super::super::atoms::side_button::*;
+
 #[derive(Properties, PartialEq)]
 pub struct Props {
     pub button_state: UseStateHandle<ButtonState>,
@@ -31,22 +33,14 @@ pub fn Sidebar(props: &Props) -> Html {
     html! {
         <div class={classes!("Sidebar")}>
             if **state == ButtonState::Login{
-                <button class={"ButtonDown"}>
-                    {"Login"}
-                </button>
+                <SideButton class={"ButtonDown"} name={"Login"} onclick={login} />
                 <br />
-                <button onclick={register} class={""}>
-                    {"Register"}
-                </button>
+                <SideButton class={""} name={"Register"} onclick={register} />
                 }
             else{
-                <button onclick={login} class={""}>
-                    {"Login"}
-                </button>
+                <SideButton class={""} name={"Login"} onclick={login} />
                 <br />
-                <button class={"ButtonDown"}>
-                    {"Register"}
-                </button>
+                <SideButton class={"ButtonDown"} name={"Register"} onclick={register} />
             }
         </div>
     }
