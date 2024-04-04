@@ -22,12 +22,8 @@ async fn login() -> Option<NamedFile> {
 }
 
 #[post("/register", format = "json", data = "<user>")]
-async fn register(db: Connection<Db>, user: Json<user::User>) -> Option<NamedFile> {
-    if let Ok(_) = user::User::verify_login(db, &*user).await {
-        NamedFile::open("success.html").await.ok()
-    } else {
-        todo!()
-    }
+async fn register(db: Connection<Db>, mut user: Json<user::User>) -> Result<(), ()> {
+    user.register_user(db).await.map_err(|_| ())
 }
 
 #[get("/<file>")]

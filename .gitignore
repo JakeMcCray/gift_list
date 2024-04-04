@@ -1,4 +1,4 @@
 gift_list.db
 /*/target
-/ui/dist/*
+/ui/dist
 /server/Rocket.toml

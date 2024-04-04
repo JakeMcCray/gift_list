@@ -19,13 +19,6 @@ pub enum UserError {
     UserDontExist,
 }
 
-#[derive(Deserialize)]
-#[serde(crate = "rocket::serde")]
-enum PHash {
-    Password(String),
-    Hash(String),
-}
-
 /***********************************
  *  Note:
  *
@@ -40,7 +33,7 @@ enum PHash {
 pub struct User {
     username: String,
     email: Option<String>,
-    password: PHash,
+    password: String,
 }
 
 impl User {
@@ -61,15 +54,13 @@ impl User {
         User::name_is_free(&mut **db, &self.username).await?;
         if let Some(email) = &self.email {
             User::email_is_free(&mut **db, email).await?;
-        }
+        };
 
-        self.try_hash_password();
+        let hash = Self::try_hash_password(self.password.to_owned())?;
 
-        match &self.password {
-            PHash::Hash(hash) => User::enter_user(&self.username, &self.email, hash, db).await,
-            PHash::Password(_) => Err(UserError::HashError),
-        }
+        Self::enter_user(&self.username, &self.email, &hash, db).await?;
         //drop Mutex here
+        Ok(())
     }
 
     /******************************************
@@ -86,63 +77,27 @@ impl User {
         hash: &str,
         mut db: Connection<Db>,
     ) -> Result<(), UserError> {
-        //I am left with a choice
-        //On one hand I can have nested match statments, and leave the code somewhat confusing to
-        //read
-        //...
-        //On the other hand I can put the inner match statments into two functions, and create
-        //confusing names for the functions
         match email {
             Some(email) => {
-                match sqlx::query("INSERT INTO users (name,email,p_hash) VALUES (?, ?, ?)")
+                sqlx::query("INSERT INTO users ('name', 'email', 'pHash') VALUES (?, ?, ?)")
                     .bind(username)
                     .bind(email)
                     .bind(hash)
                     .execute(&mut **db)
                     .await
-                {
-                    Ok(_) => Ok(()),
-                    Err(_) => Err(UserError::DatabaseError),
-                }
+                    .map(|_| ())
+                    .map_err(|_| UserError::DatabaseError)
             }
-            None => {
-                match sqlx::query("INSERT INTO users (name,p_hash) VALUES (?, ?)")
-                    .bind(username)
-                    .bind(hash)
-                    .execute(&mut **db)
-                    .await
-                {
-                    Ok(_) => Ok(()),
-                    Err(_) => Err(UserError::DatabaseError),
-                }
-            }
+            None => sqlx::query("INSERT INTO users ('name', 'pHash') VALUES (?, ?)")
+                .bind(username)
+                .bind(hash)
+                .execute(&mut **db)
+                .await
+                .map(|_| ())
+                .map_err(|_| UserError::DatabaseError),
         }
     }
 
-    /******************************************
-     *  Function: hash_password
-     *
-     *  Desc: tries to hash the password of a user
-     * ***************************************/
-
-    fn try_hash_password(&mut self) {
-        match &self.password {
-            PHash::Password(pass) => {
-                let salt = SaltString::generate(&mut OsRng);
-
-                let argon2 = Argon2::default();
-
-                match argon2.hash_password(String::from(pass).as_bytes(), &salt) {
-                    Ok(hash) => self.password = PHash::Hash(hash.to_string()),
-
-                    Err(_) => (), //¯\_(ツ)_/¯ error handeling is for chumps
-                                  //note: this means that i will need to error handle whenever i
-                                  //want a hash from the user
-                }
-            }
-            PHash::Hash(_) => (),
-        }
-    }
     /******************************************
      *  Function: name_is_free
      *
@@ -208,19 +163,20 @@ impl User {
      *
      * ***************************************/
     pub async fn verify_login(mut db: Connection<Db>, user: &User) -> Result<(), UserError> {
-        match sqlx::query("SELECT p_hash FROM users WHERE name = ?")
+        match sqlx::query("SELECT pHash FROM users WHERE name = ?")
             .bind(&user.username)
             .fetch_one(&mut **db)
             .await
         {
             Ok(hash) => {
                 let hash: &str = hash.get("p_hash");
-                User::check_password(hash, &user.password)
+                todo!();
+                //                User::check_password(hash, &user.password)
             }
             Err(_) => Err(UserError::DatabaseError),
         }
     }
-
+    /*
     /******************************************
      *  Function: verify_login
      *
@@ -245,5 +201,24 @@ impl User {
             //idk if this is what i want to do, maybe come back later and fix
             PHash::Hash(_) => Err(UserError::HashError),
         }
+    }
+    */
+
+    /******************************************
+     *  Function: hash_password
+     *
+     *  Desc: tries to hash the password of a user
+     *  and returns the hashed password
+     * ***************************************/
+
+    fn try_hash_password(password: String) -> Result<String, UserError> {
+        let salt = SaltString::generate(&mut OsRng);
+
+        let argon2 = Argon2::default();
+
+        argon2
+            .hash_password(String::from(password).as_bytes(), &salt)
+            .map(|a| a.to_string())
+            .map_err(|_| UserError::HashError)
     }
 }
