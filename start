@@ -1,11 +1,31 @@
 #!/bin/bash
 
+URL="127.0.0.1:8000"
+CLI=""
+
+# Parse command-line options
+while getopts ":r" opt; do
+  case ${opt} in
+    r ) # Set URL for release mode
+        URL="gift-list.shuttle.rs"
+	CLI="--release"
+      ;;
+    \? ) echo "Usage: $0 [-r]"
+         exit 1
+      ;;
+  esac
+done
+
+export URL=$URL
+
 pushd ui > /dev/null 2>&1
 echo "Building UI..."
-trunk build > /dev/null 2>&1
+trunk build $CLI > /dev/null 2>&1
 popd > /dev/null 2>&1
 
 pushd server > /dev/null 2>&1
 echo "Running server..."
-cargo run
+cargo shuttle run
 popd > /dev/null 2>&1
+
+unset URL

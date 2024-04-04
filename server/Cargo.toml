@@ -1,5 +1,5 @@
 [package]
-name = "backend"
+name = "gift-list"
 version = "0.1.0"
 edition = "2021"
 
@@ -9,6 +9,8 @@ edition = "2021"
 argon2 = "0.5.3"
 rocket = { version = "0.5.0", features = ["json"] }
 rustls = "0.22.2"
+shuttle-rocket = "0.43.0"
+shuttle-runtime = "0.43.0"
 
 [dependencies.rocket_db_pools]
 version = "0.1.0"

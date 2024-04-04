@@ -11,14 +11,6 @@ pub struct User {
     password: String,
 }
 
-/*
-impl Into<JsValue> for User {
-    fn into(self) -> JsValue {
-        JsValue::from_serde(&self).unwrap_or(JsValue::null())
-    }
-}
-*/
-
 #[function_component]
 pub fn UserForm() -> Html {
     let user = use_state(|| User::default());
@@ -53,7 +45,9 @@ pub fn UserForm() -> Html {
 }
 
 async fn register(user: &User) {
-    let request = Request::post("http://192.168.1.97:8000/register").json(user);
+    let url = std::env!("URL");
+    let url = std::format!("http://{url}/register");
+    let request = Request::post(&url).json(user);
 
     if let Ok(request) = request {
         let _ = request.send().await;
