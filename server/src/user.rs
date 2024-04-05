@@ -158,54 +158,46 @@ impl User {
     /******************************************
      *  Function: verify_login
      *
-     *  Desc: Returns User if user can login
+     *  Desc: Returns UserID if user can login
      *  also returns false if any error occurs
      *
      * ***************************************/
-    pub async fn verify_login(mut db: Connection<Db>, user: &User) -> Result<(), UserError> {
-        match sqlx::query("SELECT pHash FROM users WHERE name = ?")
+    pub async fn verify_login(mut db: Connection<Db>, user: &User) -> Result<String, UserError> {
+        let hash: String = sqlx::query("SELECT pHash FROM users WHERE name = ?")
             .bind(&user.username)
             .fetch_one(&mut **db)
             .await
+            .map_err(|_| UserError::DatabaseError)?
+            .get("pHash");
+
+        let parsed_hash = PasswordHash::new(&hash).map_err(|_| UserError::HashError)?;
+        if Argon2::default()
+            .verify_password(user.password.as_bytes(), &parsed_hash)
+            .is_ok()
         {
-            Ok(hash) => {
-                let hash: &str = hash.get("p_hash");
-                todo!();
-                //                User::check_password(hash, &user.password)
-            }
-            Err(_) => Err(UserError::DatabaseError),
+            user.get_id(db).await
+        } else {
+            Err(UserError::PasswordFailed)
         }
     }
-    /*
-    /******************************************
-     *  Function: verify_login
-     *
-     *  Desc: Returns User if user can login
-     *  also returns false if any error occurs
-     *
-     *  this description is wrong, too lazy to
-     *  fix
-     *
-     * ***************************************/
-    fn check_password(hash: &str, password: &PHash) -> Result<(), UserError> {
-        match password {
-            PHash::Password(password) => {
-                if let Ok(parsed_hash) = PasswordHash::new(&hash) {
-                    Argon2::default()
-                        .verify_password(password.as_bytes(), &parsed_hash)
-                        .map_err(|_| UserError::PasswordFailed)
-                } else {
-                    Err(UserError::PasswordFailed)
-                }
-            }
-            //idk if this is what i want to do, maybe come back later and fix
-            PHash::Hash(_) => Err(UserError::HashError),
-        }
-    }
-    */
 
     /******************************************
-     *  Function: hash_password
+     *  Function: get_id
+     *
+     *  Desc: returns the userID of the user
+     * ***************************************/
+    async fn get_id(&self, mut db: Connection<Db>) -> Result<String, UserError> {
+        let id: u32 = sqlx::query("SELECT UserID FROM users WHERE name = ?")
+            .bind(&self.username)
+            .fetch_one(&mut **db)
+            .await
+            .map_err(|_| UserError::DatabaseError)?
+            .get("UserID");
+        Ok(id.to_string())
+    }
+
+    /******************************************
+     *  Function: try_hash_password
      *
      *  Desc: tries to hash the password of a user
      *  and returns the hashed password

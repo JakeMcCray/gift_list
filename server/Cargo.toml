@@ -7,8 +7,7 @@ edition = "2021"
 
 [dependencies]
 argon2 = "0.5.3"
-rocket = { version = "0.5.0", features = ["json"] }
-rustls = "0.22.2"
+rocket = { version = "0.5.0", features = ["json", "secrets"] }
 shuttle-rocket = "0.43.0"
 shuttle-runtime = "0.43.0"
 

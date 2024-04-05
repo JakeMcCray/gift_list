@@ -12,13 +12,24 @@ use rocket::serde::json::Json;
 use rocket_db_pools::sqlx;
 use rocket_db_pools::{Connection, Database};
 
+use rocket::http::CookieJar;
+
 #[derive(Database)]
 #[database("gift_list")]
 pub struct Db(sqlx::SqlitePool);
 
-#[get("/login")]
-async fn login() -> Option<NamedFile> {
-    todo!();
+#[post("/login", format = "json", data = "<user>")]
+async fn login(
+    db: Connection<Db>,
+    cookies: &CookieJar<'_>,
+    user: Json<user::User>,
+) -> Result<(), ()> {
+    if let Ok(id) = user::User::verify_login(db, &user).await {
+        cookies.add_private(("user", id));
+        Ok(())
+    } else {
+        Err(())
+    }
 }
 
 #[post("/register", format = "json", data = "<user>")]
