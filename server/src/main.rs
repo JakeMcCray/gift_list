@@ -12,7 +12,7 @@ use rocket::serde::json::Json;
 use rocket_db_pools::sqlx;
 use rocket_db_pools::{Connection, Database};
 
-use rocket::http::CookieJar;
+use rocket::http::{Cookie, CookieJar};
 
 #[derive(Database)]
 #[database("gift_list")]
@@ -25,7 +25,7 @@ async fn login(
     user: Json<user::User>,
 ) -> Result<(), ()> {
     if let Ok(id) = user::User::verify_login(db, &user).await {
-        cookies.add_private(("user", id));
+        cookies.add_private(Cookie::build(("user", id)).http_only(false));
         Ok(())
     } else {
         Err(())

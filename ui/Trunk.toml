@@ -1,2 +1,5 @@
 [build]
 dist = "../server/dist"
+
+[serve]
+port = 8000
