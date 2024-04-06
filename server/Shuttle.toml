@@ -1,0 +1,6 @@
+assets = [
+	"gift_list.db",
+	"Rocket.toml",
+	"dist",
+	"dist/*",
+]
