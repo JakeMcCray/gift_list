@@ -52,7 +52,7 @@ fn Content(props: &Props) -> Html {
     let page = (*props.page).clone();
     match page {
         Page::Login => html! {<LoginBox set_logged_in={props.set_logged_in.clone()} />},
-        Page::Register => html! {<RegisterBox />},
+        Page::Register => html! {<RegisterBox set_logged_in={props.set_logged_in.clone()} />},
         Page::User => html! {<User />},
         Page::Groups => html! {<Groups />},
         Page::List => html! {<List />},

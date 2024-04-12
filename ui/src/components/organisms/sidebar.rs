@@ -14,12 +14,16 @@ pub struct Props {
 pub fn Sidebar(props: &Props) -> Html {
     let state = &props.button_state;
 
-    let buttons = use_state(|| generate_buttons(*props.logged_in));
+    let buttons = if *props.logged_in {
+        generate_buttons(true)
+    } else {
+        generate_buttons(false)
+    };
 
     let buttons = buttons.clone();
     html! {
         <div class={classes!("Sidebar")}>
-            <Buttons buttons={(*buttons).clone()} state={state.clone()} />
+            <Buttons buttons={buttons} state={state.clone()} />
         </div>
     }
 }

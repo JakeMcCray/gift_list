@@ -12,11 +12,16 @@ https://gift-list.shuttleapp.rs
 
 ## Progress
 
-- Create/Login to your account [-]
+- Create/Login to your account [✅]
 - Create/Join a group [❌]
 - Edit your own list [❌]
 - See other peoples lists [❌]
 
 ## Issues / Bugs
 
-- Site does not properly log in to account unless it is refreshed
+
+## Planned QOL
+
+- Give message telling the user why login/register failed
+- Show loading animations
+- Show animation when logging in

@@ -19,11 +19,11 @@ pub fn LoginBox(props: &Props) -> Html {
     let submit = Callback::from(move |event: MouseEvent| {
         let user_clone = user_clone.clone();
         event.prevent_default();
+        let set_logged_in = set_logged_in.clone();
         wasm_bindgen_futures::spawn_local(async move {
             login(&(*user_clone)).await;
+            set_logged_in.emit(check_logged_in());
         });
-
-        set_logged_in.emit(check_logged_in());
     });
     html! {
         <div class={classes!("LoginBox")}>
@@ -33,20 +33,21 @@ pub fn LoginBox(props: &Props) -> Html {
     }
 }
 
-async fn login(user: &User) {
+pub async fn login(user: &User) {
     let url = std::env!("URL");
     let url = std::format!("http://{url}/login");
     let request = Request::post(&url).json(user);
 
     if let Ok(request) = request {
-        let _ = request.send().await;
+        let response = request.send().await;
+        log!(format!("got the response {response:?}"));
     } else if let Err(e) = request {
         let e: &str = &e.to_string();
         log!(e);
     }
 }
 
-fn check_logged_in() -> bool {
+pub fn check_logged_in() -> bool {
     log!("checking for cookies");
     match wasm_cookies::get_raw("user").is_some() {
         true => {
